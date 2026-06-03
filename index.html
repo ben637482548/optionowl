@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OptionOwl — Brainstorm & make decisions with AI</title>
+<meta name="description" content="OptionOwl turns any fuzzy idea or tough decision into simple tap-to-answer questions, using the AI chat you already use. No prompts to write, no account, just clarity." />
+<meta name="theme-color" content="#4f46e5" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>" />
+<style>
+  :root {
+    --indigo: #4f46e5;
+    --purple: #7c3aed;
+    --cyan: #06b6d4;
+    --ink: #1c1c2e;
+    --ink-soft: #54546a;
+    --card: rgba(255, 255, 255, 0.66);
+    --card-border: rgba(255, 255, 255, 0.7);
+    --shadow: 0 10px 40px rgba(60, 50, 120, 0.12);
+    --radius: 24px;
+    --maxw: 980px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #f2f2f7;
+      --ink-soft: #a8a8be;
+      --card: rgba(28, 28, 44, 0.62);
+      --card-border: rgba(255, 255, 255, 0.10);
+      --shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(1200px 800px at 10% -5%, rgba(6, 182, 212, 0.16), transparent 60%),
+      radial-gradient(1000px 700px at 100% 0%, rgba(124, 58, 237, 0.16), transparent 55%),
+      radial-gradient(1000px 900px at 50% 110%, rgba(79, 70, 229, 0.14), transparent 60%),
+      linear-gradient(160deg, #f6f9ff 0%, #eef9f6 38%, #fff5ef 70%, #f2f1ff 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background:
+        radial-gradient(1200px 800px at 10% -5%, rgba(6, 182, 212, 0.22), transparent 60%),
+        radial-gradient(1000px 700px at 100% 0%, rgba(124, 58, 237, 0.26), transparent 55%),
+        radial-gradient(1000px 900px at 50% 110%, rgba(79, 70, 229, 0.22), transparent 60%),
+        linear-gradient(160deg, #0c1018 0%, #0b1614 40%, #160d12 72%, #0c0c16 100%);
+    }
+  }
+
+  a { color: var(--indigo); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Top nav ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: saturate(160%) blur(18px);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    background: rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(120, 120, 160, 0.14);
+  }
+  @media (prefers-color-scheme: dark) {
+    header.nav { background: rgba(18, 18, 30, 0.5); }
+  }
+  .nav-inner {
+    max-width: var(--maxw); margin: 0 auto; padding: 12px 20px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 9px;
+    font-weight: 800; font-size: 1.12rem; letter-spacing: -0.02em;
+    color: var(--ink); cursor: pointer; background: none; border: 0; padding: 0;
+  }
+  .brand .owl { font-size: 1.35rem; }
+  .nav-links { display: flex; align-items: center; gap: 4px; margin-left: auto; flex-wrap: wrap; }
+  .nav-links button {
+    font: inherit; font-weight: 650; font-size: 0.93rem;
+    color: var(--ink-soft); background: none; border: 0; cursor: pointer;
+    padding: 8px 12px; border-radius: 999px;
+  }
+  .nav-links button:hover { color: var(--ink); background: rgba(120,120,160,0.12); }
+  .nav-links button.active { color: var(--indigo); background: rgba(79,70,229,0.12); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font: inherit; font-weight: 750; cursor: pointer; border: 0;
+    border-radius: 999px; padding: 13px 22px; text-decoration: none;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+  }
+  .btn:hover { text-decoration: none; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--indigo), var(--purple));
+    color: #fff; box-shadow: 0 8px 22px rgba(79, 70, 229, 0.35);
+  }
+  .btn-store {
+    background: #111; color: #fff; box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+  }
+  @media (prefers-color-scheme: dark) { .btn-store { background: #fff; color: #111; } }
+  .btn-ghost {
+    background: var(--card); color: var(--ink);
+    border: 1px solid var(--card-border); box-shadow: var(--shadow);
+  }
+  .btn.sm { padding: 9px 16px; font-size: 0.9rem; }
+
+  /* ---------- Views ---------- */
+  .view { display: none; animation: fade 0.35s ease both; }
+  .view.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  section.block { padding: 30px 0; }
+
+  /* ---------- Hero ---------- */
+  .hero { text-align: center; padding: 60px 0 30px; }
+  .hero .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--card); border: 1px solid var(--card-border);
+    box-shadow: var(--shadow); border-radius: 999px;
+    padding: 7px 15px; font-size: 0.84rem; font-weight: 700; color: var(--ink-soft);
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-size: clamp(2.1rem, 6vw, 3.5rem); line-height: 1.05; margin: 0 0 16px;
+    letter-spacing: -0.03em; font-weight: 850;
+    background: linear-gradient(125deg, var(--indigo), var(--purple) 55%, var(--cyan));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.sub {
+    font-size: clamp(1.05rem, 2.6vw, 1.3rem); color: var(--ink-soft);
+    max-width: 640px; margin: 0 auto 28px; font-weight: 500;
+  }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .owl-hero {
+    font-size: clamp(64px, 16vw, 104px); line-height: 1;
+    filter: drop-shadow(0 14px 26px rgba(79,70,229,0.28));
+    margin-bottom: 8px;
+  }
+
+  /* ---------- Cards / grids ---------- */
+  .card {
+    background: var(--card); border: 1px solid var(--card-border);
+    box-shadow: var(--shadow); border-radius: var(--radius);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    padding: 26px;
+  }
+
+  h2.section-title {
+    text-align: center; font-size: clamp(1.5rem, 4vw, 2.05rem);
+    letter-spacing: -0.02em; font-weight: 820; margin: 8px 0 6px;
+  }
+  p.section-lead { text-align: center; color: var(--ink-soft); max-width: 620px; margin: 0 auto 26px; }
+
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .step .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 12px; font-weight: 850; font-size: 1.1rem;
+    color: #fff; margin-bottom: 12px;
+  }
+  .step h3 { margin: 0 0 6px; font-size: 1.12rem; font-weight: 780; letter-spacing: -0.01em; }
+  .step p { margin: 0; color: var(--ink-soft); font-size: 0.96rem; }
+
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .feature .ico { font-size: 1.7rem; margin-bottom: 8px; display: block; }
+  .feature h3 { margin: 0 0 5px; font-size: 1.06rem; font-weight: 770; }
+  .feature p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  .final-cta { text-align: center; padding: 18px; }
+  .final-cta .card { padding: 40px 26px; }
+
+  /* ---------- Doc pages (privacy / support) ---------- */
+  .doc h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); letter-spacing: -0.02em; margin: 10px 0 4px; font-weight: 840; }
+  .doc .updated { color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 22px; }
+  .doc h2 { font-size: 1.2rem; font-weight: 780; margin: 26px 0 8px; letter-spacing: -0.01em; }
+  .doc p, .doc li { color: var(--ink); }
+  .doc .card p:last-child { margin-bottom: 0; }
+  .doc ul { padding-left: 20px; }
+  .doc li { margin: 6px 0; }
+  .muted { color: var(--ink-soft); }
+
+  .faq details {
+    border-bottom: 1px solid rgba(120,120,160,0.18); padding: 14px 2px;
+  }
+  .faq details:last-child { border-bottom: 0; }
+  .faq summary {
+    cursor: pointer; font-weight: 720; font-size: 1.04rem; list-style: none;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary .chev { transition: transform 0.2s ease; color: var(--ink-soft); font-weight: 700; }
+  .faq details[open] summary .chev { transform: rotate(90deg); }
+  .faq details p { color: var(--ink-soft); margin: 10px 0 2px; }
+
+  .email-pill {
+    display: inline-flex; align-items: center; gap: 9px; flex-wrap: wrap;
+    background: linear-gradient(135deg, rgba(79,70,229,0.10), rgba(6,182,212,0.10));
+    border: 1px solid var(--card-border); border-radius: 16px; padding: 14px 18px;
+    font-weight: 700; word-break: break-all;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 30px; padding: 30px 0 40px;
+    border-top: 1px solid rgba(120,120,160,0.16); text-align: center; color: var(--ink-soft);
+  }
+  footer .foot-links { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+  footer .foot-links button {
+    font: inherit; font-weight: 650; color: var(--ink-soft); background: none; border: 0;
+    cursor: pointer; padding: 6px 10px; border-radius: 999px;
+  }
+  footer .foot-links button:hover { color: var(--ink); }
+  footer .fine { font-size: 0.82rem; max-width: 600px; margin: 10px auto 0; }
+
+  .disclaimer { font-size: 0.82rem; color: var(--ink-soft); text-align: center; margin-top: 18px; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <button class="brand" data-go="home" aria-label="OptionOwl home">
+      <span class="owl">🦉</span> OptionOwl
+    </button>
+    <nav class="nav-links">
+      <button data-go="home">Home</button>
+      <button data-go="privacy">Privacy</button>
+      <button data-go="support">Support</button>
+      <a class="btn btn-primary sm" href="https://apps.apple.com/us" target="_blank" rel="noopener">Get the App</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===================== HOME ===================== -->
+  <div id="view-home" class="view">
+    <section class="hero">
+      <div class="owl-hero">🦉</div>
+      <span class="badge">✨ Your AI thinking partner</span>
+      <h1>Turn fuzzy ideas into clear decisions.</h1>
+      <p class="sub">
+        OptionOwl turns any messy idea, plan, or tough decision into simple
+        tap-to-answer questions, using the AI chat you already use. No prompts to
+        write. No account. Just clarity. 💡
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-store" href="https://apps.apple.com/us" target="_blank" rel="noopener"> Download on the App Store</a>
+        <button class="btn btn-ghost" data-scroll="how-it-works">How it works</button>
+      </div>
+    </section>
+
+    <section class="block" id="how-it-works">
+      <h2 class="section-title">A simple loop that does your thinking with you 🔁</h2>
+      <p class="section-lead">
+        Most people freeze when they open an AI chat: what do I even ask? OptionOwl
+        removes that. It writes the prompt for you and turns the AI's reply into a
+        tappable checklist. Four easy steps, about a minute each.
+      </p>
+      <div class="steps">
+        <div class="card step">
+          <span class="num" style="background:linear-gradient(135deg,#06b6d4,#0891b2)">1</span>
+          <h3>📝 Write your idea</h3>
+          <p>Jot down whatever is on your mind, rough and messy. OptionOwl attaches a smart, ready-made prompt automatically.</p>
+        </div>
+        <div class="card step">
+          <span class="num" style="background:linear-gradient(135deg,#4f46e5,#4338ca)">2</span>
+          <h3>💬 Send it to your AI</h3>
+          <p>Open ChatGPT, Gemini, Claude, or any AI chat, right inside OptionOwl or in your favorite app. Paste and send.</p>
+        </div>
+        <div class="card step">
+          <span class="num" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">3</span>
+          <h3>📋 Paste the reply back</h3>
+          <p>Copy the AI's answer into OptionOwl and tap Build Sheet. It becomes a tidy, tappable set of questions.</p>
+        </div>
+        <div class="card step">
+          <span class="num" style="background:linear-gradient(135deg,#10b981,#059669)">4</span>
+          <h3>✅ Tap your answers</h3>
+          <p>Pick the choice you like, edit it, or write your own. OptionOwl copies your answers so you can keep refining.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2 class="section-title">Why you'll love OptionOwl 💜</h2>
+      <div class="features">
+        <div class="card feature">
+          <span class="ico">🧠</span>
+          <h3>No prompt skills needed</h3>
+          <p>The prompt is built for you. Just answer easy multiple-choice questions with a tap.</p>
+        </div>
+        <div class="card feature">
+          <span class="ico">🔒</span>
+          <h3>Private by design</h3>
+          <p>No account, no servers, no tracking. Everything you type stays on your iPhone.</p>
+        </div>
+        <div class="card feature">
+          <span class="ico">🤝</span>
+          <h3>Works with any AI</h3>
+          <p>ChatGPT, Gemini, Claude, and more. Use the built-in browser or your favorite app.</p>
+        </div>
+        <div class="card feature">
+          <span class="ico">🎯</span>
+          <h3>Made for real decisions</h3>
+          <p>Plans, projects, business ideas, tradeoffs, or just getting unstuck. Think clearly, fast.</p>
+        </div>
+        <div class="card feature">
+          <span class="ico">⚡</span>
+          <h3>Open and go</h3>
+          <p>No sign-up screens. Finish the quick tour and you are thinking with AI in seconds.</p>
+        </div>
+        <div class="card feature">
+          <span class="ico">🔤</span>
+          <h3>Comfortable to read</h3>
+          <p>Adjust the in-app text size so every question and answer is easy on your eyes.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="block final-cta">
+      <div class="card">
+        <div style="font-size:2.4rem; margin-bottom:6px;">🦉✨</div>
+        <h2 class="section-title">Ready to think more clearly?</h2>
+        <p class="section-lead">Download OptionOwl and turn your next big idea or decision into a plan you feel good about.</p>
+        <div class="cta-row">
+          <a class="btn btn-store" href="https://apps.apple.com/us" target="_blank" rel="noopener"> Download on the App Store</a>
+        </div>
+      </div>
+      <p class="disclaimer">
+        OptionOwl is an independent app and is not affiliated with, endorsed by, or sponsored by
+        OpenAI, Google, or Anthropic. ChatGPT, Gemini, and Claude are trademarks of their respective owners.
+      </p>
+    </section>
+  </div>
+
+  <!-- ===================== PRIVACY ===================== -->
+  <div id="view-privacy" class="view doc">
+    <section class="block">
+      <h1>🔒 Privacy Policy</h1>
+      <p class="updated">Last updated: June 2, 2026</p>
+
+      <div class="card">
+        <p><strong>OptionOwl is private by design.</strong> We built it so your thinking stays yours. OptionOwl has no user accounts, no sign-up, and no servers of its own, and it does not collect, sell, or share your personal information. This policy explains what that means in plain language.</p>
+
+        <h2>Information we collect</h2>
+        <p><strong>None.</strong> OptionOwl does not collect personal data. There is no account to create and no profile to fill in. Everything you create in the app, including your ideas, prompts, answer sheets, saved AI chat shortcuts, and settings, is stored only on your device. We never receive or see it.</p>
+
+        <h2>Information we do not collect</h2>
+        <ul>
+          <li>No names, email addresses, or contact details.</li>
+          <li>No location data.</li>
+          <li>No analytics, usage tracking, or advertising identifiers.</li>
+          <li>No access to your photos, contacts, microphone, or files.</li>
+        </ul>
+        <p class="muted">OptionOwl does not track you across apps or websites, and it includes no third-party advertising or analytics SDKs.</p>
+
+        <h2>Subscriptions and payments</h2>
+        <p>OptionOwl offers an optional auto-renewable subscription, OptionOwl Pro. All payments are processed by Apple through the App Store. OptionOwl never sees or stores your payment information, billing details, or Apple Account credentials. Apple's handling of your purchase is governed by Apple's own privacy policy.</p>
+
+        <h2>Third-party AI services</h2>
+        <p>OptionOwl helps you work with AI chat assistants such as ChatGPT (OpenAI), Gemini (Google), and Claude (Anthropic). The Chats tab opens these services, or any website you add yourself, in an in-app browser. When you use them, you interact directly with those companies, and anything you choose to send is governed by their own privacy policies and terms. You sign in on their websites; OptionOwl never sees those passwords, and it does not read, store, or transmit your conversations with them.</p>
+
+        <h2>Data storage and deletion</h2>
+        <p>Your content lives on your device. To delete everything OptionOwl has stored, simply delete the app from your iPhone. There is nothing stored on our side to request or erase, because we never had a copy.</p>
+
+        <h2>Children's privacy</h2>
+        <p>OptionOwl is rated for users 17 and older and is not directed to children. We do not knowingly collect information from anyone, including children.</p>
+
+        <h2>Security</h2>
+        <p>Because your data never leaves your device and we operate no servers, there is no central database of your information that could be exposed. Your content is protected by your device's own security.</p>
+
+        <h2>Changes to this policy</h2>
+        <p>If we update this policy, we will revise the date at the top of this page. Significant changes will be reflected here before they take effect.</p>
+
+        <h2>Contact us</h2>
+        <p>Questions about privacy? We are happy to help. 📬</p>
+        <p class="email-pill">✉️ <a href="mailto:plugin-syllabi1t@icloud.com">plugin-syllabi1t@icloud.com</a></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===================== SUPPORT ===================== -->
+  <div id="view-support" class="view doc">
+    <section class="block">
+      <h1>💬 Support</h1>
+      <p class="updated">We're here to help you get the most out of OptionOwl.</p>
+
+      <div class="card" style="margin-bottom:18px;">
+        <h2 style="margin-top:4px;">📬 Get in touch</h2>
+        <p>Have a question, found a bug, or want to suggest a feature? Email us and we'll get back to you, usually within 1 to 2 business days.</p>
+        <p class="email-pill">✉️ <a href="mailto:plugin-syllabi1t@icloud.com">plugin-syllabi1t@icloud.com</a></p>
+        <p class="muted" style="margin-bottom:0;">Tip: tell us your iPhone model and iOS version so we can help faster. 🙏</p>
+      </div>
+
+      <div class="card faq">
+        <h2 style="margin-top:4px;">❓ Frequently asked questions</h2>
+
+        <details open>
+          <summary>What is OptionOwl and how do I use it? <span class="chev">›</span></summary>
+          <p>OptionOwl helps you turn a rough idea or decision into something clear, using an AI chat. (1) Write your idea in the Brainstorm tab. (2) Tap Copy and send it to ChatGPT, Gemini, Claude, or any AI, inside OptionOwl or in your own app. (3) Copy the AI's reply back into the Paste tab and tap Build Sheet. (4) Tap your answers in the Answer tab. Send them back to the AI and repeat until your idea is clear.</p>
+        </details>
+
+        <details>
+          <summary>Do I need an account? <span class="chev">›</span></summary>
+          <p>No. OptionOwl has no sign-up and no login of its own. Just open the app, finish the short welcome tour, and start. You will sign in to your AI of choice on its own website if you use the built-in Chats tab.</p>
+        </details>
+
+        <details>
+          <summary>Which AI assistants does it work with? <span class="chev">›</span></summary>
+          <p>OptionOwl works with any AI chat, including ChatGPT, Gemini, and Claude. The Chats tab has built-in shortcuts to those three, and you can add any other AI chat by tapping "Add an AI chat" and entering its website address. You can also just use your favorite AI app outside OptionOwl.</p>
+        </details>
+
+        <details>
+          <summary>How do the free trial and subscription work? <span class="chev">›</span></summary>
+          <p>OptionOwl Pro unlocks the full app. The monthly plan starts with a 7-day free trial, then bills monthly. A yearly plan is also available as the best value. Subscriptions renew automatically unless you cancel at least 24 hours before the period ends. You can cancel anytime, and you will keep access until the end of the period you already paid for.</p>
+        </details>
+
+        <details>
+          <summary>How do I cancel or manage my subscription? <span class="chev">›</span></summary>
+          <p>Subscriptions are managed through your Apple Account, not inside OptionOwl. On your iPhone: open the <strong>Settings</strong> app, tap your name at the top, tap <strong>Subscriptions</strong>, choose <strong>OptionOwl</strong>, and then change or cancel your plan. You can also tap <strong>Manage Subscription</strong> on OptionOwl's own Settings tab, which opens the same screen.</p>
+        </details>
+
+        <details>
+          <summary>I subscribed, but the app still shows the paywall. <span class="chev">›</span></summary>
+          <p>Tap <strong>Restore</strong> on the paywall, or go to OptionOwl's Settings tab and tap <strong>Restore Purchases</strong>. Make sure you are signed in to the same Apple Account you used to subscribe, and that you have an internet connection. If it still does not unlock, email us and we'll sort it out.</p>
+        </details>
+
+        <details>
+          <summary>How do I restore a purchase on a new iPhone? <span class="chev">›</span></summary>
+          <p>Sign in to the new device with the same Apple Account, open OptionOwl, and tap <strong>Restore</strong> on the paywall or <strong>Restore Purchases</strong> in Settings. Your OptionOwl Pro access will reactivate.</p>
+        </details>
+
+        <details>
+          <summary>Is my data private? Where is it stored? <span class="chev">›</span></summary>
+          <p>Yes. Everything you type stays on your iPhone. OptionOwl has no servers and collects no personal data or analytics. See our <a href="#privacy">Privacy Policy</a> for the full details.</p>
+        </details>
+
+        <details>
+          <summary>The text is too small (or too big). Can I change it? <span class="chev">›</span></summary>
+          <p>Yes. Open the <strong>Settings</strong> tab in OptionOwl and use <strong>Text size in OptionOwl</strong> to make every word bigger or smaller. Tap Reset to return to 100%. OptionOwl also respects your system Dynamic Type setting.</p>
+        </details>
+
+        <details>
+          <summary>How do I see the welcome tour again? <span class="chev">›</span></summary>
+          <p>Open the <strong>Settings</strong> tab and tap <strong>Replay Welcome Tour</strong>. Your saved ideas, prompts, and answers stay untouched.</p>
+        </details>
+      </div>
+    </section>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-links">
+      <button data-go="home">Home</button>
+      <button data-go="privacy">Privacy Policy</button>
+      <button data-go="support">Support</button>
+      <a href="https://apps.apple.com/us" target="_blank" rel="noopener" style="padding:6px 10px;">App Store</a>
+    </div>
+    <div>🦉 OptionOwl · © 2026 · Made with care.</div>
+    <p class="fine">OptionOwl is an independent app and is not affiliated with, endorsed by, or sponsored by OpenAI, Google, or Anthropic. ChatGPT, Gemini, and Claude are trademarks of their respective owners.</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var views = {
+      home:    { el: document.getElementById('view-home'),    title: 'OptionOwl — Brainstorm & make decisions with AI' },
+      privacy: { el: document.getElementById('view-privacy'), title: 'Privacy Policy — OptionOwl' },
+      support: { el: document.getElementById('view-support'), title: 'Support — OptionOwl' }
+    };
+
+    function routeFromHash() {
+      var h = (location.hash || '').replace('#', '').toLowerCase();
+      if (h !== 'privacy' && h !== 'support') h = 'home';
+      return h;
+    }
+
+    function render(route) {
+      Object.keys(views).forEach(function (key) {
+        views[key].el.classList.toggle('active', key === route);
+      });
+      // Active state on nav buttons
+      document.querySelectorAll('.nav-links button[data-go]').forEach(function (b) {
+        b.classList.toggle('active', b.getAttribute('data-go') === route);
+      });
+      document.title = views[route].title;
+      // Jump to top on view change so each "page" starts at its heading.
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    function go(route) {
+      // Setting the hash triggers hashchange, which calls render().
+      // Home uses an empty hash so the canonical URL stays clean.
+      if (route === 'home') {
+        if (location.hash) {
+          history.pushState('', document.title, location.pathname + location.search);
+        }
+        render('home');
+      } else {
+        location.hash = route;
+      }
+    }
+
+    // Wire up every element with a data-go attribute (nav, footer, in-page buttons).
+    document.querySelectorAll('[data-go]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        go(el.getAttribute('data-go'));
+      });
+    });
+
+    // In-page smooth scroll for elements that point at a section on the
+    // current view (e.g. the hero "How it works" button -> the steps section).
+    document.querySelectorAll('[data-scroll]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        var target = document.getElementById(el.getAttribute('data-scroll'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    window.addEventListener('hashchange', function () { render(routeFromHash()); });
+
+    // Initial render based on the URL the visitor arrived at (#privacy / #support / base).
+    render(routeFromHash());
+  })();
+</script>
+
+</body>
+</html>
